@@ -46,8 +46,17 @@ async function login(page, url, username, password) {
     // perform log-in
     await page.click('div[data-ng-click="showLogin()"]');
     await page.waitForSelector('div.cbox > input');
-    await page.type('input[ng-model="user.email"]', username, { delay: 50 });
-    await page.type('input[ng-model="user.password"]', password, { delay: 50 });
+
+    // hack: pressing backspace before email/password values are typed
+    // see https://github.com/puppeteer/puppeteer/issues/1648#issuecomment-881521529
+    await page.click('input[ng-model="user.email"]', {delay: 100});
+    await page.keyboard.press('Backspace');
+    await page.type('input[ng-model="user.email"]', username, {delay: 50});
+
+    await page.click('input[ng-model="user.password"]', {delay: 100});
+    await page.keyboard.press('Backspace');
+    await page.type('input[ng-model="user.password"]', password, {delay: 50});
+
     await page.click('div.cbox > input');
     await page.waitForSelector('p.log');
     await page.waitForTimeout(2000); // just in case :-)
@@ -60,6 +69,11 @@ async function login(page, url, username, password) {
 }
 
 (async () => {
+    if (!process.env.HEO_USERNAME || !process.env.HEO_PASSWORD) {
+        console.error('Username/Password not set');
+        return;
+    }
+
     console.time('login + get page data');
 
     const browser = await puppeteer.launch(); // headless browser
