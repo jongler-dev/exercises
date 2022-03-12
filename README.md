@@ -1,5 +1,5 @@
 # exercises
-All sorts of of useful things I wrote along the way:
+All sorts of useful things I wrote along the way:
 * coding exercises
 * scripts
 * POCs
