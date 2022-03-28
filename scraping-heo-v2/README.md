@@ -1,0 +1,33 @@
+# scraping-heo-v2
+
+A package for basic scraping of [Heo](https://www.heo.com) B2B website.
+Scraping is done in via a Node.js script with [puppeteer](https://www.npmjs.com/package/puppeteer).
+
+> **Note:**
+>
+> This repo is the basis of a bigger project, a fully functional scrapper for heo.com.
+>
+> Please contact me for further details.
+
+## Overview
+
+This is an improved version to [scraping-heo-v1](https://github.com/jongler-dev/exercises/tree/master/scraping-heo-v1), since it adds:
+
+1. a better repo file structure.
+2. unit tests, using [Mocha.js](https://www.npmjs.com/package/mocha) test framework and [Chai.js](https://www.npmjs.com/package/chai) assertion library.
+3. environment variables support, using [dotenv-safe](https://www.npmjs.com/package/dotenv-safe).
+
+## Usage
+
+```
+npm install
+cp .env.sample .env
+enter your heo.com credetials to .env.
+npm start
+```
+
+## Testing
+
+```
+npm test
+```
