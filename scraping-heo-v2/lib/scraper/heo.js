@@ -9,7 +9,7 @@ const self = {
   cookies: [],
 
   // mandatory params: username, password
-  // optional params: headless
+  // optional params: headless, useCookies
   async init(params) {
     if (!params?.username || !params?.password) {
       throw new Error('Username/Password missing');
@@ -17,7 +17,7 @@ const self = {
 
     const options = {};
     if (params.headless !== undefined) {
-      options.headless = params?.headless;
+      options.headless = params.headless;
     }
 
     try {
