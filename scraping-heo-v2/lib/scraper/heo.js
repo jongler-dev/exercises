@@ -20,17 +20,13 @@ const self = {
       options.headless = params.headless;
     }
 
-    try {
-      self.browser = await puppeteer.launch(options);
-      self.page = await self.browser.newPage();
+    self.browser = await puppeteer.launch(options);
+    self.page = await self.browser.newPage();
 
-      if (params.useCookies) {
-        await self._loginWithCookies(params.username, params.password);
-      } else {
-        await self._login(params.username, params.password);
-      }
-    } catch (err) {
-      throw err;
+    if (params.useCookies) {
+      await self._loginWithCookies(params.username, params.password);
+    } else {
+      await self._login(params.username, params.password);
     }
   },
 
@@ -61,7 +57,7 @@ const self = {
     await self.page.goto(HOME_URL, { waitUntil: 'networkidle2' });
 
     // already logged-in
-    let loginText = await self.page.$eval('p.log', (data) => data.innerText);
+    const loginText = await self.page.$eval('p.log', (data) => data.innerText);
     if (loginText === 'Logout') {
       console.log('already logged-in');
       return;
@@ -95,7 +91,7 @@ const self = {
     await self.page.waitForTimeout(2000); // just in case :-)
 
     // verify successful log-in
-    loginText = await self.page.$eval('p.log', (data) => data.innerText);
+    const loginText = await self.page.$eval('p.log', (data) => data.innerText);
     if (loginText !== 'Logout') {
       throw new Error('Login failed');
     }
