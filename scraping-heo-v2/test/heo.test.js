@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 require('dotenv-safe').config();
 
 const heo = require('../lib/scraper/heo');
@@ -18,7 +18,7 @@ describe('Heo tests - sanity', () => {
     expect.fail('Should have thrown');
   });
 
-  it('missing username in credentials', async () => {
+  it('missing username', async () => {
     try {
       await heo.init({ password: 'fake-password' });
     } catch (err) {
@@ -30,7 +30,7 @@ describe('Heo tests - sanity', () => {
     expect.fail('Should have thrown');
   });
 
-  it('missing password in credentials', async () => {
+  it('missing password', async () => {
     try {
       await heo.init({ username: 'fake-username' });
     } catch (err) {
@@ -45,7 +45,10 @@ describe('Heo tests - sanity', () => {
   it('bad username/password', async function () {
     this.timeout(TEST_TIMEOUT_MS);
     try {
-      await heo.init({ username: 'fake-username', password: 'fake-password' });
+      await heo.init({
+        username: 'fake-username',
+        password: 'fake-password',
+      });
     } catch (err) {
       expect(err.message).to.equal('Login failed');
       await heo.term();
@@ -55,12 +58,44 @@ describe('Heo tests - sanity', () => {
     expect.fail('Should have thrown');
   });
 
-  it('successful login', async function () {
+  it('successful login - use credentials, not cookies', async function () {
     this.timeout(TEST_TIMEOUT_MS);
     try {
       await heo.init({
         username: process.env.HEO_USERNAME,
         password: process.env.HEO_PASSWORD,
+      });
+    } catch (err) {
+      expect.fail('Should NOT have thrown');
+    } finally {
+      await heo.term();
+    }
+  });
+
+  it('successful login - no cookies available, login and store them', async function () {
+    this.timeout(TEST_TIMEOUT_MS);
+    try {
+      await heo.resetCookies();
+
+      await heo.init({
+        username: process.env.HEO_USERNAME,
+        password: process.env.HEO_PASSWORD,
+        useCookies: true,
+      });
+    } catch (err) {
+      expect.fail('Should NOT have thrown');
+    } finally {
+      await heo.term();
+    }
+  });
+
+  it('successful login - cookies available, use them', async function () {
+    this.timeout(TEST_TIMEOUT_MS);
+    try {
+      await heo.init({
+        username: process.env.HEO_USERNAME,
+        password: process.env.HEO_PASSWORD,
+        useCookies: true,
       });
     } catch (err) {
       expect.fail('Should NOT have thrown');
@@ -77,6 +112,7 @@ describe('Heo tests - basic functionality', function () {
     await heo.init({
       username: process.env.HEO_USERNAME,
       password: process.env.HEO_PASSWORD,
+      useCookies: true,
     });
   });
 

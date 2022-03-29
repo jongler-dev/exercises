@@ -16,6 +16,7 @@ This is an improved version to [scraping-heo-v1](https://github.com/jongler-dev/
 1. a better repo file structure.
 2. unit tests, using [Mocha.js](https://www.npmjs.com/package/mocha) test framework and [Chai.js](https://www.npmjs.com/package/chai) assertion library.
 3. environment variables support, using [dotenv-safe](https://www.npmjs.com/package/dotenv-safe).
+4. Use of the browser's cookies for faster processing time in case running sequential calls, removing the need to re-login every time.
 
 ## Usage
 

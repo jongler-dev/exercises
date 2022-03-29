@@ -6,18 +6,29 @@ const PRODUCT_URL = (productId) => `${HOME_URL}/product/${productId}`;
 const self = {
   browser: null,
   page: null,
-  credentials: {},
+  cookies: [],
 
-  async init(credentials, headless = true) {
-    if (!credentials?.username || !credentials?.password) {
+  // mandatory params: username, password
+  // optional params: headless
+  async init(params) {
+    if (!params?.username || !params?.password) {
       throw new Error('Username/Password missing');
     }
 
+    const options = {};
+    if (params.headless !== undefined) {
+      options.headless = params?.headless;
+    }
+
     try {
-      self.browser = await puppeteer.launch({ headless: headless });
+      self.browser = await puppeteer.launch(options);
       self.page = await self.browser.newPage();
-      self.credentials = credentials;
-      await self._login();
+
+      if (params.useCookies) {
+        await self._loginWithCookies(params.username, params.password);
+      } else {
+        await self._login(params.username, params.password);
+      }
     } catch (err) {
       throw err;
     }
@@ -27,7 +38,26 @@ const self = {
     await self.browser?.close();
   },
 
-  async _login() {
+  // mainly for testing
+  async resetCookies() {
+    self.cookies = [];
+  },
+
+  async _loginWithCookies(username, password) {
+    // if cookies are available then set them to page and we are logged in
+    if (self.cookies.length > 0) {
+      await self.page.setCookie(...self.cookies);
+      return;
+    }
+
+    await self.page.goto(HOME_URL, { waitUntil: 'networkidle2' });
+
+    await self.submitLoginCredentials(username, password);
+
+    self.cookies = await self.page.cookies();
+  },
+
+  async _login(username, password) {
     await self.page.goto(HOME_URL, { waitUntil: 'networkidle2' });
 
     // already logged-in
@@ -37,7 +67,11 @@ const self = {
       return;
     }
 
-    // perform log-in
+    await self.submitLoginCredentials(username, password);
+  },
+
+  async submitLoginCredentials(username, password) {
+    // perform login
     await self.page.click('div.login-top');
     await self.page.waitForSelector('div.cbox > input');
 
@@ -45,26 +79,19 @@ const self = {
     // see https://github.com/puppeteer/puppeteer/issues/1648#issuecomment-881521529
     await self.page.click('input[ng-model="user.email"]', { delay: 100 });
     await self.page.keyboard.press('Backspace');
-    await self.page.type(
-      'input[ng-model="user.email"]',
-      self.credentials.username,
-      {
-        delay: 50,
-      }
-    );
+    await self.page.type('input[ng-model="user.email"]', username, {
+      delay: 50,
+    });
 
     await self.page.click('input[ng-model="user.password"]', { delay: 100 });
     await self.page.keyboard.press('Backspace');
-    await self.page.type(
-      'input[ng-model="user.password"]',
-      self.credentials.password,
-      {
-        delay: 50,
-      }
-    );
+    await self.page.type('input[ng-model="user.password"]', password, {
+      delay: 50,
+    });
 
     await self.page.click('div.cbox > input');
     await self.page.waitForSelector('p.log');
+    // await self.page.waitForNavigation({ waitUntil: 'networkidle0' });
     await self.page.waitForTimeout(2000); // just in case :-)
 
     // verify successful log-in
@@ -74,10 +101,12 @@ const self = {
     }
   },
 
+  // the function assumes the user is logged in
   async getProductById(productId) {
     return self.getProductByUrl(PRODUCT_URL(productId));
   },
 
+  // the function assumes the user is logged in
   async getProductByUrl(url) {
     try {
       await self.page.goto(url, { waitUntil: 'networkidle2' });
