@@ -1,4 +1,4 @@
-# scraping_heo_exercise
+# scraping-heo-exercise
 
 This simple script was a test for scraping the data of a product on [heo.com](www.heo.com), a B2B e-commerce site, using [puppeteer](https://pptr.dev/), a Node.js library for controlling a web browser.
 
@@ -6,9 +6,12 @@ Since some of the product data is visiable only after a successful login, I've i
 
 ---
 
-Note: this is only a tiny bite from a bigger and more concise project where I've implemented a full **website scraper and products tracker**,
+**Note**
+this is only a tiny bite from a bigger and more concise project where I've implemented a full **website scraper and products tracker**.
 
-## An even bigger preview of the full project is available at [heo-scraper-preview](https://github.com/jongler-dev/heo-scraper-preview).
+An even bigger preview of the full project is available at [heo-scraper-preview](https://github.com/jongler-dev/heo-scraper-preview).
+
+---
 
 ## Usage:
 
